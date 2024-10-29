@@ -6,7 +6,10 @@ export default function MainLayout() {
         <View style={styles.containerMain}>
             <Stack>
                 {/* Primera ruta que se mostrará */}
-                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="index" options={{ headerShown: false }}/>
+                <Stack.Screen name="login" options={{ headerShown: false }}/>
+                <Stack.Screen name="register" options={{ headerShown: false }}/>
+                <Stack.Screen name="recovery" options={{ headerShown: false }}/>
                 {/* Aquí es donde activaremos las Tabs */}
                 <Stack.Screen name="movieTabs" options={{ headerShown: false }} />
             </Stack>

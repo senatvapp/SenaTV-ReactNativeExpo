@@ -8,18 +8,18 @@ export default function WelcomeScreen() {
     const router = useRouter();
     return (
         <View style={styles.container}>
-        <StatusBar style="dark" />
-        <Text style={styles.text}>
-            Descubre, organiza y disfruta tus series como nunca antes.
-        </Text>
-        <Image source={image} style={styles.image} />
-            <Pressable  style={({ pressed }) => [
-                styles.button,
-                { opacity: pressed ? 0.5 : 1 }, // Cambia la opacidad si está presionado
-        ]}
-        onPress={() => router.push("login")}>
-                <Text style={styles.textButton}>Iniciar</Text>
-            </Pressable>
+          <StatusBar style="dark" />
+          <Text style={styles.text}>
+              Descubre, organiza y disfruta tus series como nunca antes.
+          </Text>
+          <Image source={image} style={styles.image} />
+              <Pressable  style={({ pressed }) => [
+                  styles.button,
+                  { opacity: pressed ? 0.5 : 1 }, // Cambia la opacidad si está presionado
+          ]}
+          onPress={() => router.push("login")}>
+                  <Text style={styles.textButton}>Iniciar</Text>
+              </Pressable>
         </View>
     );
 }
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
           backgroundColor: "rgba(145, 188, 190, 1)",
           alignItems: "center",
           justifyContent: "center",
-      
+          flex: 1,
         },
         text: {
           color: "black",
