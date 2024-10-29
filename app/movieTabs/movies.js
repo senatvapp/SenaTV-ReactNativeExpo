@@ -1,9 +1,8 @@
 import { View, Text } from 'react-native';
+import MovieList from '../../components/MovieList';
 
 export default function Movies() {
     return (
-        <View>
-            <Text>Moviessssssssss</Text>
-        </View>
+        <MovieList />
     );
 }

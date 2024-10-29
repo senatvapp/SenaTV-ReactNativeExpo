@@ -29,7 +29,7 @@ export default function LoginScreen() {
         console.log(user);
 
         if (user.emailVerified) {
-          router.push('/MovieScreen/movies');
+          router.push('/movieTabs/movies');
         } else {
           Alert.alert(
             'Email no verificado',

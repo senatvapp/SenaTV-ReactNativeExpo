@@ -17,11 +17,9 @@ export default function WelcomeScreen() {
                 styles.button,
                 { opacity: pressed ? 0.5 : 1 }, // Cambia la opacidad si está presionado
         ]}
-        onPress={() => router.push("/movieTabs/addMovies")}>
+        onPress={() => router.push("login")}>
                 <Text style={styles.textButton}>Iniciar</Text>
             </Pressable>
-            
-      
         </View>
     );
 }
