@@ -3,7 +3,7 @@ import { View, Text, TextInput, Pressable, StyleSheet, Image, TouchableOpacity, 
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 import { Link } from "expo-router";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, sendEmailVerification} from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../firebase-config';
 import { useRouter } from 'expo-router';
@@ -15,7 +15,6 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const navigation = useNavigation();
   const router = useRouter();
   
   const app = initializeApp(firebaseConfig);
@@ -29,7 +28,14 @@ export default function LoginScreen() {
         console.log(user);
 
         if (user.emailVerified) {
-          router.push('/movieTabs/movies');
+          if(email === 'xrandres369@gmail.com') {
+            console.log('Entro en esta condicion');
+            router.push('/movieTabs/movies');
+          }
+          else{
+            router.push('/movieUser');
+          }
+          
         } else {
           Alert.alert(
             'Email no verificado',

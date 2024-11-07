@@ -1,9 +1,7 @@
-import { View, Text } from 'react-native';
+import AddMovieForm from '../../components/AddMovieForm';
 
 export default function AddMovies() {
     return (
-        <View>
-            <Text>Add Movie Screennndassssssssssssssssssssssssssssssss</Text>
-        </View>
+        <AddMovieForm />
     );
 }

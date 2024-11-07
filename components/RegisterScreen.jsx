@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../firebase-config';
 import { useNavigation } from '@react-navigation/native';
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -19,11 +21,11 @@ export default function RegisterScreen() {
   const handleCreateAccount = () => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log('Account created!');
+        console.log('Cuenta Creada!');
         const user = userCredential.user;
         console.log(user);
         sendEmailVerification(user); // Envía el correo de verificación al crear la cuenta
-        Alert.alert('Verification email sent', 'Please check your email to verify your account.');
+        Alert.alert('Email de verificación enviado', 'Revisa ru correo para verificar la cuenta.');
         navigation.navigate('login')
       })
       .catch((error) => {
@@ -42,6 +44,28 @@ export default function RegisterScreen() {
           placeholder="Email"
           value={email}
           onChangeText={(text) => setEmail(text)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+         placeholderTextColor="gray"
+        /> 
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre"
+          value={name}
+          onChangeText={(text) => setName(text)}
+          keyboardType="text"
+          autoCapitalize="none"
+         placeholderTextColor="gray"
+        /> 
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Apellido"
+          value={lastName}
+          onChangeText={(text) => setLastName(text)}
           keyboardType="email-address"
           autoCapitalize="none"
          placeholderTextColor="gray"

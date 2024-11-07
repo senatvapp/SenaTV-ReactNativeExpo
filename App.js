@@ -8,7 +8,7 @@ export default function App(props) {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Text style={styles.text}>
-        asdas, organiza y disfruta tus series como nunca antes.
+        Descubre, organiza y disfruta tus series como nunca antes.
       </Text>
       <Image source={image} style={styles.image} />
       <Pressable style={styles.button} onPress={onPress}>

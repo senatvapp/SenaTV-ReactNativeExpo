@@ -1,19 +1,26 @@
 import React from 'react';
 import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 
 const MovieCard = ({ movie }) => {
+  const router = useRouter(); // Hook de expo-router para navegar
+  const handlePress = () => {
+    router.push('detailMoviesUser'); 
+  };
   return (
-    <View style={styles.card}>
-              <TouchableOpacity onPress={() => onDelete(movie.id)} style={styles.closeButton}>
-                  <Text style={styles.closeText}>X</Text>
-              </TouchableOpacity>
-              <Image source={{ uri: movie.image }} style={styles.image} />
-              <Text style={styles.title}>{movie.title}</Text>
-              <Text>{movie.year}</Text>
-              <Text>{movie.genre}</Text>
-              <Text>Director: {movie.director}</Text>
-          </View>
+    <TouchableOpacity onPress={handlePress}>
+      <View style={styles.card}>
+        <TouchableOpacity onPress={() => onDelete(movie.id)} style={styles.closeButton}>
+          <Text style={styles.closeText}>X</Text>
+        </TouchableOpacity>
+        <Image source={{ uri: movie.image }} style={styles.image} />
+        <Text style={styles.title}>{movie.title}</Text>
+        <Text>{movie.year}</Text>
+        <Text>{movie.genre}</Text>
+        <Text>Director: {movie.director}</Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -98,7 +105,8 @@ const styles = StyleSheet.create({
     parentContainer: {
         flex: 1,             // Para ocupar todo el espacio disponible
         justifyContent: "center", // Centra verticalmente
-        alignItems: "center",     // Centra horizontalmente
+        alignItems: "center",
+        backgroundColor: '#91BCBE',   // Centra horizontalmente
       },
   container: {
     flexDirection: 'row',

@@ -40,7 +40,7 @@ export default function MovieTabsLayout() {
                 <Tabs.Screen 
                     name="movies" 
                     options={{ 
-                        title: "Movies", 
+                        title: "Peliculas/Series", 
                         headerShown: false,
                         tabBarIcon: ({ color, size }) => (
                             <Ionicons name="film-outline" size={size} color={color} />
@@ -50,13 +50,13 @@ export default function MovieTabsLayout() {
                 <Tabs.Screen 
                     name="addMovies" 
                     options={{ 
-                        title: "Add Movie", 
+                        title: "Agregar contenido", 
                         headerShown: false,
                         tabBarIcon: ({ color, size }) => (
                             <Ionicons name="add-circle-outline" size={size} color={color} />
                         ),
                     }}
-                />
+                />  
             </Tabs>
         </SafeAreaView>
     );
