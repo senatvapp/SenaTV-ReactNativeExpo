@@ -14,8 +14,6 @@ export default function AddMovieForm() {
   const [image, setImage] = useState('');
 
   const usuario_creacion = '1'; 
-  const genero_contenido_codigo= '2';
-  const tipo_contenido_codigo = '2';
 
   const handleAddMovie = async () => {
     const newMovie = {
@@ -25,12 +23,12 @@ export default function AddMovieForm() {
       imagen_url: image,
       director,
       usuario_creacion, // Puedes usar un valor estático o dinámico
-      tipo_contenido_codigo,
-      genero_contenido_codigo,
+      tipo_contenido_codigo: type,
+      genero_contenido_codigo: genre,
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/contenido', {
+      const response = await fetch('http://192.168.1.13:3000/api/contenido', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,8 +38,8 @@ export default function AddMovieForm() {
 
       if (response.ok) {
         const data = await response.json();
-        Alert.alert('Éxito', 'Película agregada correctamente');
-        // Resetear los campos del formulario
+        console.log('Exito', 'Película agregada correctamente');
+        // Resetear los camp.os del formulario
         setTitle('');
         setYear('');
         setGenre('');
@@ -51,10 +49,10 @@ export default function AddMovieForm() {
         setImage('');
       } else {
         const errorData = await response.json();
-        Alert.alert('Error', `Error al agregar película: ${errorData.message}`);
+        console.log('Error', `Error else: ${errorData.message}`);
       }
     } catch (error) {
-      Alert.alert('Error', `Error al conectarse al servidor: ${error.message}`);
+      console.log('Error', `Error catch: ${error.message}`);
     }
   };
   return (
@@ -84,13 +82,13 @@ export default function AddMovieForm() {
           style={styles.input}
         >
           <Picker.Item label="Seleccionar Género" value="" />
-          <Picker.Item label="Acción" value="Acción" />
-          <Picker.Item label="Comedia" value="Comedia" />
-          <Picker.Item label="Drama" value="Drama" />
-          <Picker.Item label="Terror" value="Terror" />
-          <Picker.Item label="Romance" value="Romance" />
-          <Picker.Item label="Ciencia Ficción" value="Ciencia Ficción" />
-          <Picker.Item label="Musical" value="Musical" />
+          <Picker.Item label="Acción" value="1" />
+          <Picker.Item label="Comedia" value="2" />
+          <Picker.Item label="Drama" value="3" />
+          <Picker.Item label="Terror" value="4" />
+          <Picker.Item label="Romance" value="5" />
+          <Picker.Item label="Ciencia Ficción" value="6" />
+          <Picker.Item label="Musical" value="7" />
 
          </Picker> 
        </View> 
@@ -101,10 +99,10 @@ export default function AddMovieForm() {
           style={styles.input}
         >
           <Picker.Item label="Seleccionar Tipo" value="" />
-          <Picker.Item label="Película" value="Película" />
-          <Picker.Item label="Serie" value="Serie" />
-          <Picker.Item label="Documental" value="Documental" />
-          <Picker.Item label="Cortometraje" value="Cortometraje" />
+          <Picker.Item label="Película" value="1" />
+          <Picker.Item label="Serie" value="2" />
+          <Picker.Item label="Documental" value="3" />
+          <Picker.Item label="Cortometraje" value="4" />
          </Picker>
        </View> 
       <View style={styles.inputContainer}>
@@ -134,7 +132,7 @@ export default function AddMovieForm() {
       <View style={styles.buttonContainer}>
         <Pressable    
         onPress={handleAddMovie} style={styles.loginButton}>
-          <Text style={styles.loginButtonText}>Registrarse</Text>
+          <Text style={styles.loginButtonText}>Agregar pelicula</Text>
         </Pressable>
       </View>
     </View>

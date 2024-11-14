@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TextInput, Button, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TextInput, Button, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const CommentCard = ({ comment, onDelete, onEdit }) => {
@@ -17,7 +17,8 @@ const CommentCard = ({ comment, onDelete, onEdit }) => {
   );
 };
 
-const MovieScreen = () => {
+const MovieScreen = () => { 
+  // Obtenemos el id de la ruta
   // Datos de la película almacenados en useState
   const [movie, setMovie] = useState({
     title: 'Mulholland Drive',
@@ -70,6 +71,7 @@ const MovieScreen = () => {
         </View>
 
         {/* Imagen de la película */}
+        {/* <Image source={{ uri: movie.image ? movie.image : 'https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg' }} onError={() => console.log('Error al cargar la imagen.')} style={styles.image} /> */}
         <Image
           style={styles.movieImage}
           source={{ uri: movie.image }} // Imagen de la película desde el estado

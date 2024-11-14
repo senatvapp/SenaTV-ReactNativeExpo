@@ -1,7 +1,18 @@
 import React from 'react';
-import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity, alert } from 'react-native';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
+
+
+const generoMap = {
+  "1": "Acción",
+  "2": "Comedia",
+  "3": "Drama",
+  "4": "Terror",
+  "5": "Romance",
+  "6": "Ciencia Ficción",
+  "7": "Musical"
+};
 
 const MovieCard = ({ movie }) => {
   const router = useRouter(); // Hook de expo-router para navegar
@@ -14,10 +25,12 @@ const MovieCard = ({ movie }) => {
         <TouchableOpacity onPress={() => onDelete(movie.id)} style={styles.closeButton}>
           <Text style={styles.closeText}>X</Text>
         </TouchableOpacity>
-        <Image source={{ uri: movie.image }} style={styles.image} />
+        {movie.imagen_url ? ( // Validación antes de mostrar la imagen
+          <Image source={{ uri: movie.imagen_url }} style={styles.image} />
+        ) : null}
         <Text style={styles.title}>{movie.title}</Text>
         <Text>{movie.year}</Text>
-        <Text>{movie.genre}</Text>
+        <Text>{generoMap[movie.genero_contenido_codigo] || "Género desconocido"}</Text>
         <Text>Director: {movie.director}</Text>
       </View>
     </TouchableOpacity>
@@ -25,57 +38,22 @@ const MovieCard = ({ movie }) => {
 };
 
 const MovieList = () => {
-    const [email, setEmail] = useState('');
-  const movies = [
-    {
-      id: '1',
-      title: 'Flash',
-      year: '2024',
-      genre: 'Ciencia ficción, ficción',
-      director: 'Andrés Muschietti',
-      image: 'https://example.com/flash.jpg',
-    },
-    {
-      id: '2',
-      title: 'Mulholland Drive',
-      year: '2001',
-      genre: 'Thriller, misterio',
-      director: 'David Lynch',
-      image: 'https://example.com/mulholland_drive.jpg',
-    },
-    {
-      id: '3',
-      title: 'Inception',
-      year: '2010',
-      genre: 'Ciencia ficción, thriller',
-      director: 'Christopher Nolan',
-      image: 'https://example.com/inception.jpg',
-    },
-    {
-      id: '4',
-      title: 'The Matrix',
-      year: '1999',
-      genre: 'Ciencia ficción, acción',
-      director: 'Lana Wachowski, Lilly Wachowski',
-      image: 'https://example.com/matrix.jpg',
-    },
-    {
-        id: '5',
-        title: 'The Matrix',
-        year: '1999',
-        genre: 'Ciencia ficción, acción',
-        director: 'Lana Wachowski, Lilly Wachowski',
-        image: 'https://example.com/matrix.jpg',
-      },
-      {
-        id: '6',
-        title: 'The Matrix',
-        year: '1999',
-        genre: 'Ciencia ficción, acción',
-        director: 'Lana Wachowski, Lilly Wachowski',
-        image: 'https://example.com/matrix.jpg',
-      },
-  ];
+  const [email, setEmail] = useState('');
+  const [movies, setMovies] = useState([]);
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const response = await fetch('http://192.168.1.13:3000/api/contenido'); 
+        const data = await response.json();
+        setMovies(data); 
+      } catch (error) {
+        Alert.alert('Error', `Error al obtener las películas: ${error.message}`);
+      }
+    };
+
+    fetchMovies();
+  }, []);
 
   return (
     <View style={styles.parentContainer}>

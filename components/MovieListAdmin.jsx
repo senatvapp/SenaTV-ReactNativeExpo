@@ -1,23 +1,38 @@
-import React from 'react';
-import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 
-const MovieCard = ({ movie }) => {
-  const router = useRouter(); // Hook de expo-router para navegar
+
+const generoMap = {
+  "1": "Acción",
+  "2": "Comedia",
+  "3": "Drama",
+  "4": "Terror",
+  "5": "Romance",
+  "6": "Ciencia Ficción",
+  "7": "Musical"
+};
+
+const MovieCard = ({ movie, onDelete }) => {
+  const router = useRouter();
+
   const handlePress = () => {
-    router.push('/detailMoviesAdmin'); 
+    router.push(`/detailMovies/`); // Enviamos el id como parte de la ruta
   };
+
   return (
     <TouchableOpacity onPress={handlePress}>
       <View style={styles.card}>
         <TouchableOpacity onPress={() => onDelete(movie.id)} style={styles.closeButton}>
           <Text style={styles.closeText}>X</Text>
         </TouchableOpacity>
-        <Image source={{ uri: movie.image }} style={styles.image} />
-        <Text style={styles.title}>{movie.title}</Text>
-        <Text>{movie.year}</Text>
-        <Text>{movie.genre}</Text>
+        {movie.imagen_url ? ( // Validación antes de mostrar la imagen
+          <Image source={{ uri: movie.imagen_url }} style={styles.image} />
+        ) : null}
+        <Text style={styles.title}>{movie.nombre}</Text>
+        <Text>{movie.anio_lanzamiento}</Text>
+        <Text>{generoMap[movie.genero_contenido_codigo] || "Género desconocido"}</Text>
         <Text>Director: {movie.director}</Text>
       </View>
     </TouchableOpacity>
@@ -25,57 +40,49 @@ const MovieCard = ({ movie }) => {
 };
 
 const MovieList = () => {
-    const [email, setEmail] = useState('');
-  const movies = [
-    {
-      id: '1',
-      title: 'Flash',
-      year: '2024',
-      genre: 'Ciencia ficción, ficción',
-      director: 'Andrés Muschietti',
-      image: 'https://example.com/flash.jpg',
-    },
-    {
-      id: '2',
-      title: 'Mulholland Drive',
-      year: '2001',
-      genre: 'Thriller, misterio',
-      director: 'David Lynch',
-      image: 'https://example.com/mulholland_drive.jpg',
-    },
-    {
-      id: '3',
-      title: 'Inception',
-      year: '2010',
-      genre: 'Ciencia ficción, thriller',
-      director: 'Christopher Nolan',
-      image: 'https://example.com/inception.jpg',
-    },
-    {
-      id: '4',
-      title: 'The Matrix',
-      year: '1999',
-      genre: 'Ciencia ficción, acción',
-      director: 'Lana Wachowski, Lilly Wachowski',
-      image: 'https://example.com/matrix.jpg',
-    },
-    {
-        id: '5',
-        title: 'The Matrix',
-        year: '1999',
-        genre: 'Ciencia ficción, acción',
-        director: 'Lana Wachowski, Lilly Wachowski',
-        image: 'https://example.com/matrix.jpg',
-      },
-      {
-        id: '6',
-        title: 'The Matrix',
-        year: '1999',
-        genre: 'Ciencia ficción, acción',
-        director: 'Lana Wachowski, Lilly Wachowski',
-        image: 'https://example.com/matrix.jpg',
-      },
-  ];
+  const [email, setEmail] = useState('');
+  const [movies, setMovies] = useState([]);
+ 
+  const fetchMovies = async () => {
+    try {
+      const response = await fetch('http://192.168.1.13:3000/api/contenido');
+      const data = await response.json();
+      setMovies(data);
+      console.log("Movies fetched:", data);
+    } catch (error) {
+      Alert.alert('Error', `Error al obtener las películas: ${error.message}`);
+    }
+  };
+  useEffect(() => {
+     fetchMovies();
+  }, []);
+
+  // useEffect(() => {
+  //   // Iniciar el intervalo de pooling cada segundo (1000 ms)
+  //   const intervalId = setInterval(fetchMovies, 1000);
+
+  //   // Limpiar el intervalo cuando el componente se desmonte
+  //   return () => clearInterval(intervalId);
+  // }, []);
+  
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://192.168.1.13:3000/api/contenido/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al eliminar: ${response.statusText}`);
+      }
+
+      // Elimina la película del estado y actualiza la interfaz
+      setMovies((prevMovies) => prevMovies.filter(movie => movie.id !== id));
+      Alert.alert('Eliminación exitosa', 'La película ha sido eliminada.');
+    } catch (error) {
+      console.error('Error al eliminar la película:', error.message);
+      Alert.alert('Error', `No se pudo eliminar la película: ${error.message}`);
+    }
+  };
 
   return (
     <View style={styles.parentContainer}>
@@ -92,7 +99,7 @@ const MovieList = () => {
       </View>
       <ScrollView contentContainerStyle={styles.container}>
         {movies.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
+          <MovieCard key={movie.id} movie={movie} onDelete={handleDelete} />
         ))}
       </ScrollView>
     </View>
@@ -103,11 +110,11 @@ export default MovieList;
 
 const styles = StyleSheet.create({
   parentContainer: {
-    flex: 1,             // Para ocupar todo el espacio disponible
-    justifyContent: "center", // Centra verticalmente
-    alignItems: "center", 
-    backgroundColor: '#91BCBE',    // Centra horizontalmente
-    },
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: '#91BCBE',
+  },
   container: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -127,7 +134,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   input: {
-    margin:5,
+    margin: 5,
     flex: 1,
     height: 40,
     color: "black",
