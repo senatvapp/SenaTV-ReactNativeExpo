@@ -18,8 +18,12 @@ const MovieCard = ({ movie, onDelete }) => {
   const router = useRouter();
 
   const handlePress = () => {
-    router.push(`/detailMovies/`); // Enviamos el id como parte de la ruta
+    router.push({
+      pathname: '/detailMoviesAdmin',
+      params: { movieId: movie.id },
+    });
   };
+
 
   return (
     <TouchableOpacity onPress={handlePress}>
