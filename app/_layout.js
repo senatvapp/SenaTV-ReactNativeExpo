@@ -13,6 +13,7 @@ export default function MainLayout() {
                 <Stack.Screen name="movieUser" options={{ headerShown: false }}/>
                 <Stack.Screen name="detailMoviesUser" options={{ headerShown: false }}/>
                 <Stack.Screen name="detailMoviesAdmin" options={{ headerShown: false }}/>
+                <Stack.Screen name="editMovie" options={{ headerShown: false }}/>
                 {/* Aquí es donde activaremos las Tabs */}
                 <Stack.Screen name="movieTabs" options={{ headerShown: false }} />
             </Stack>

@@ -28,9 +28,9 @@ export default function LoginScreen() {
         console.log(user);
 
         if (user.emailVerified) {
-          if(email === 'xrandres369@gmail.com') {
-            console.log('Entro en esta condicion');
+          if(email === 'senatvapp@gmail.com') {
             router.push('/movieTabs/movies');
+            console.log('Entro en esta condicion');
           }
           else{
             router.push('/movieUser');

@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+
 
 
 const generoMap = {
@@ -13,6 +16,7 @@ const generoMap = {
   "6": "Ciencia Ficción",
   "7": "Musical"
 };
+
 
 const MovieCard = ({ movie, onDelete }) => {
   const router = useRouter();
@@ -29,7 +33,7 @@ const MovieCard = ({ movie, onDelete }) => {
     <TouchableOpacity onPress={handlePress}>
       <View style={styles.card}>
         <TouchableOpacity onPress={() => onDelete(movie.id)} style={styles.closeButton}>
-          <Text style={styles.closeText}>X</Text>
+         <Icon name="trash" size={16} color="#91BCBE" />
         </TouchableOpacity>
         {movie.imagen_url ? ( // Validación antes de mostrar la imagen
           <Image source={{ uri: movie.imagen_url }} style={styles.image} />
@@ -44,14 +48,17 @@ const MovieCard = ({ movie, onDelete }) => {
 };
 
 const MovieList = () => {
-  const [email, setEmail] = useState('');
+  
+  const [searchQuery, setSearchQuery] = useState('');
   const [movies, setMovies] = useState([]);
+  const [filteredMovies, setFilteredMovies] = useState([]);
  
   const fetchMovies = async () => {
     try {
       const response = await fetch('http://192.168.1.13:3000/api/contenido');
       const data = await response.json();
       setMovies(data);
+      setFilteredMovies(data);
       console.log("Movies fetched:", data);
     } catch (error) {
       Alert.alert('Error', `Error al obtener las películas: ${error.message}`);
@@ -69,6 +76,16 @@ const MovieList = () => {
   //   return () => clearInterval(intervalId);
   // }, []);
   
+  useEffect(() => {
+    // Filtrar las películas en función del texto ingresado
+    const lowercasedQuery = searchQuery.toLowerCase();
+    const filtered = movies.filter(movie =>
+      movie.nombre.toLowerCase().includes(lowercasedQuery)
+    );
+    setFilteredMovies(filtered);
+  }, [searchQuery, movies]); // Ejecutar el filtrado cada vez que cambie la búsqueda o las películas
+
+
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`http://192.168.1.13:3000/api/contenido/${id}`, {
@@ -88,21 +105,22 @@ const MovieList = () => {
     }
   };
 
+
   return (
     <View style={styles.parentContainer}>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           placeholder="Buscar"
-          value={email}
-          onChangeText={setEmail}
+          value={searchQuery}
+          onChangeText={setSearchQuery} 
           keyboardType="email-address"
           autoCapitalize="none"
           placeholderTextColor="gray"
         />
       </View>
       <ScrollView contentContainerStyle={styles.container}>
-        {movies.map((movie) => (
+        {filteredMovies.map(movie => (
           <MovieCard key={movie.id} movie={movie} onDelete={handleDelete} />
         ))}
       </ScrollView>
@@ -170,7 +188,7 @@ const styles = StyleSheet.create({
   closeButton: {
     position: 'absolute',
     top: 5,
-    right: 5,
+    right: 1,
     borderRadius: 15,
     width: 30,
     height: 30,

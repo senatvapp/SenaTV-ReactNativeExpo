@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TextInput, Button, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, Alert, StyleSheet} from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { useParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 
+const generoMap = {
+  "1": "Acción",
+  "2": "Comedia",
+  "3": "Drama",
+  "4": "Terror",
+  "5": "Romance",
+  "6": "Ciencia Ficción",
+  "7": "Musical"
+};
 const CommentCard = ({ comment, onDelete, onEdit }) => {
   return (
     <View style={styles.card}>
@@ -19,51 +29,45 @@ const CommentCard = ({ comment, onDelete, onEdit }) => {
 };
 
 const MovieScreen = () => {
-
-  const { id } = useParams();
-  console.log(id);
-  const [movie, setMovie] = useState(null); // Estado para la película
-  // Datos de la película almacenados en useState
-  // const [movie, setMovie] = useState({
-  //   title: 'Mulholland Drive',
-  //   year: '2001',
-  //   genre: 'Thriller',
-  //   description: 'It tells the story of an aspiring actress named Betty Elms (Watts), newly arrived in Los Angeles, who meets and befriends an amnesiac woman (Harring) recovering from a car accident. The story follows several other vignettes and characters, including a Hollywood film director (Theroux).',
-  //   image: 'https://image.tmdb.org/t/p/w500/example.jpg' // Cambia esto a la URL real de la imagen
-  // });
+  const { movieId } = useLocalSearchParams();
+  const [movie, setMovie] = useState({});
+  const [filteredMovies, setFilteredMovies] = useState([]);
+  const router = useRouter();
 
   const [comments, setComments] = useState([
     { id: '1', user: 'Usuario 1', text: 'Me pareció genial la película, tiene una muy buena trama' },
     { id: '2', user: 'Usuario 2', text: 'No me gustó, muy difícil de entender.' },
   ]);
-  
+  const [newComment, setNewComment] = useState('');
+
+  // Fetch de la información de la película
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/contenido/${id}`);
+        const response = await fetch(`http://192.168.1.13:3000/api/contenido/${movieId}`);
         if (!response.ok) {
-          throw new Error('Error fetching movie data');
+          throw new Error('Error al obtener los detalles de la película');
         }
         const data = await response.json();
-        setMovie(data); // Asumimos que el dato de la película está en la respuesta
+        setMovie(data);
+        console.log("Movie fetched:", data);
       } catch (error) {
-        console.error('Error fetching movie data:', error);
+        Alert.alert('Error', `Error al obtener la película: ${error.message}`);
       }
     };
 
-    fetchMovie();
-  }, [id]); // Se ejecuta cuando el id cambia
+    if (movieId) {
+      fetchMovie();
+    }
+  }, [movieId]);
 
-  const [newComment, setNewComment] = useState('');
 
-  const handleDelete = (id) => {
+
+  const handleDeleteComments = (id) => {
     setComments((prevComments) => prevComments.filter(comment => comment.id !== id));
   };
 
-  const handleEdit = (id) => {
-    // Lógica para editar el comentario
-    console.log("Editar comentario con ID:", id);
-  };
+  
 
   const handleAddComment = () => {
     if (newComment.trim()) {
@@ -79,40 +83,47 @@ const MovieScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.detailSection}>      
+      <View style={styles.detailSection}>
+        {/* Editar película */}
+        
+
+        
+
+        {/* Título y Año */}
         <View style={styles.header}>
-          <Text style={styles.title}>{movie.title}</Text>
-          <Text style={styles.year}>{movie.year}</Text>
+          <Text style={styles.title}>{movie.nombre}</Text>
+          <Text style={styles.year}>{movie.anio_lanzamiento}</Text>
         </View>
 
         {/* Imagen de la película */}
-
-        {/* <Image source={{ uri: movie.image ? movie.image : 'https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg' }} 
-        onError={() => console.log('Error al cargar la imagen.')} 
-        style={styles.image} /> */}
-        {/* <Image
+        <Image
           style={styles.movieImage}
-          source={{ uri: movie.image }} // Imagen de la película desde el estado
-        /> */}
+          source={{ uri: movie.
+            imagen_url || 'https://www.shutterstock.com/image-vector/default-ui-image-placeholder-wireframes-600nw-1037719192.jpg' }}
+        />
+        
+        {/* Género y Descripción */}
         <View style={styles.header}>
-          {/* Género */}
-          <Text style={styles.genre}>Género: {movie.genre}</Text>
-          {/* Descripción */}
-          <Text style={styles.description}>{movie.description}</Text>
+        <Text style={styles.genre}>
+            Género: {generoMap[movie.genero_contenido_codigo] || "Género desconocido"}
+          </Text>
+          <Text style={styles.description}>{movie.sinopsis}</Text>
         </View>
+
+        {/* Eliminar película */}
         
-        
+
       </View>
 
-      {/* Comentarios */}
+      {/* Sección de Comentarios */}
       <View style={styles.commentsSection}>
         <ScrollView style={styles.comment}>
           {comments.map((comment) => (
             <CommentCard
               key={comment.id}
               comment={comment}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
+              onDelete={() => handleDelete(comment.id)}
+              onEdit={() => handleEdit(comment.id)}
             />
           ))}
         </ScrollView>
@@ -126,7 +137,7 @@ const MovieScreen = () => {
             onChangeText={setNewComment}
           />
           <TouchableOpacity style={styles.commentButton} onPress={handleAddComment}>
-            <Icon name="send" size={16} color="white" /> {/* Ícono de enviar */}
+            <Icon name="send" size={16} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -134,10 +145,13 @@ const MovieScreen = () => {
   );
 };
 
+export default MovieScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 30,
+    paddingTop:50,
     backgroundColor: '#91BCBE',
   },
   detailSection: {
@@ -232,4 +246,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MovieScreen;

@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity, alert } from 'react-native';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 const generoMap = {
@@ -14,22 +15,25 @@ const generoMap = {
   "7": "Musical"
 };
 
-const MovieCard = ({ movie }) => {
-  const router = useRouter(); // Hook de expo-router para navegar
+const MovieCard = ({ movie, onDelete }) => {
+  const router = useRouter();
+
   const handlePress = () => {
-    router.push('detailMoviesUser'); 
+    router.push({
+      pathname: '/detailMoviesUser',
+      params: { movieId: movie.id },
+    });
   };
+
+
   return (
     <TouchableOpacity onPress={handlePress}>
       <View style={styles.card}>
-        <TouchableOpacity onPress={() => onDelete(movie.id)} style={styles.closeButton}>
-          <Text style={styles.closeText}>X</Text>
-        </TouchableOpacity>
         {movie.imagen_url ? ( // Validación antes de mostrar la imagen
           <Image source={{ uri: movie.imagen_url }} style={styles.image} />
         ) : null}
-        <Text style={styles.title}>{movie.title}</Text>
-        <Text>{movie.year}</Text>
+        <Text style={styles.title}>{movie.nombre}</Text>
+        <Text>{movie.anio_lanzamiento}</Text>
         <Text>{generoMap[movie.genero_contenido_codigo] || "Género desconocido"}</Text>
         <Text>Director: {movie.director}</Text>
       </View>
@@ -38,22 +42,45 @@ const MovieCard = ({ movie }) => {
 };
 
 const MovieList = () => {
-  const [email, setEmail] = useState('');
+  
+  const [searchQuery, setSearchQuery] = useState('');
   const [movies, setMovies] = useState([]);
-
+  const [filteredMovies, setFilteredMovies] = useState([]);
+ 
+  const fetchMovies = async () => {
+    try {
+      const response = await fetch('http://192.168.1.13:3000/api/contenido');
+      const data = await response.json();
+      setMovies(data);
+      setFilteredMovies(data);
+      console.log("Movies fetched:", data);
+    } catch (error) {
+      Alert.alert('Error', `Error al obtener las películas: ${error.message}`);
+    }
+  };
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const response = await fetch('http://192.168.1.13:3000/api/contenido'); 
-        const data = await response.json();
-        setMovies(data); 
-      } catch (error) {
-        Alert.alert('Error', `Error al obtener las películas: ${error.message}`);
-      }
-    };
-
-    fetchMovies();
+     fetchMovies();
   }, []);
+
+  // useEffect(() => {
+  //   // Iniciar el intervalo de pooling cada segundo (1000 ms)
+  //   const intervalId = setInterval(fetchMovies, 1000);
+
+  //   // Limpiar el intervalo cuando el componente se desmonte
+  //   return () => clearInterval(intervalId);
+  // }, []);
+  
+  useEffect(() => {
+    // Filtrar las películas en función del texto ingresado
+    const lowercasedQuery = searchQuery.toLowerCase();
+    const filtered = movies.filter(movie =>
+      movie.nombre.toLowerCase().includes(lowercasedQuery)
+    );
+    setFilteredMovies(filtered);
+  }, [searchQuery, movies]); // Ejecutar el filtrado cada vez que cambie la búsqueda o las películas
+
+
+
 
   return (
     <View style={styles.parentContainer}>
@@ -61,16 +88,16 @@ const MovieList = () => {
         <TextInput
           style={styles.input}
           placeholder="Buscar"
-          value={email}
-          onChangeText={setEmail}
+          value={searchQuery}
+          onChangeText={setSearchQuery} 
           keyboardType="email-address"
           autoCapitalize="none"
           placeholderTextColor="gray"
         />
       </View>
       <ScrollView contentContainerStyle={styles.container}>
-        {movies.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
+        {filteredMovies.map(movie => (
+          <MovieCard key={movie.id} movie={movie}  />
         ))}
       </ScrollView>
     </View>
@@ -80,12 +107,12 @@ const MovieList = () => {
 export default MovieList;
 
 const styles = StyleSheet.create({
-    parentContainer: {
-        flex: 1,             // Para ocupar todo el espacio disponible
-        justifyContent: "center", // Centra verticalmente
-        alignItems: "center",
-        backgroundColor: '#91BCBE',   // Centra horizontalmente
-      },
+  parentContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: '#91BCBE',
+  },
   container: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -105,7 +132,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   input: {
-    margin:5,
+    margin: 5,
     flex: 1,
     height: 40,
     color: "black",
@@ -137,7 +164,7 @@ const styles = StyleSheet.create({
   closeButton: {
     position: 'absolute',
     top: 5,
-    right: 5,
+    right: 1,
     borderRadius: 15,
     width: 30,
     height: 30,
