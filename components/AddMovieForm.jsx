@@ -28,7 +28,7 @@ export default function AddMovieForm() {
     };
 
     try {
-      const response = await fetch('http://192.168.1.13:3000/api/contenido', {
+      const response = await fetch('http://192.168.68.107:3000/api/contenido', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

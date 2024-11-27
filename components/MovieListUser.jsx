@@ -49,7 +49,7 @@ const MovieList = () => {
  
   const fetchMovies = async () => {
     try {
-      const response = await fetch('http://192.168.1.13:3000/api/contenido');
+      const response = await fetch('http://192.168.68.107:3000/api/contenido');
       const data = await response.json();
       setMovies(data);
       setFilteredMovies(data);

@@ -1,10 +1,16 @@
-// import React, { useState } from 'react';
-// import { View, Text, Image, StyleSheet, ScrollView, TextInput, Button, TouchableOpacity, Alert } from 'react-native';
-// import Icon from 'react-native-vector-icons/FontAwesome';
-// import { useLocalSearchParams } from 'expo-router';
-// import { useEffect } from 'react';
+
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, Alert, StyleSheet, Platform, KeyboardAvoidingView} from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CommentCard = ({ comment, onDelete, onEdit }) => {
+
+  console.log(onDelete);
+  
+  
   return (
     <View style={styles.card}>
       {/* Contenido del comentario */}
@@ -12,18 +18,12 @@ const CommentCard = ({ comment, onDelete, onEdit }) => {
       <Text style={styles.commentText}>{comment.text}</Text>
 
       {/* Ícono de basura para eliminar */}
-      <TouchableOpacity onPress={() => onDelete(comment.id)} style={styles.deleteButton}>
+      <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
         <Icon name="trash" size={16} color="#91BCBE" />
       </TouchableOpacity>
     </View>
   );
 };
-
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TextInput, ScrollView, TouchableOpacity, Alert, StyleSheet} from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { useRouter } from 'expo-router';
 
 const generoMap = {
   "1": "Acción",
@@ -36,22 +36,18 @@ const generoMap = {
 };
 
 const MovieScreen = () => {
-  const { movieId } = useLocalSearchParams();
+  const { movieId} = useLocalSearchParams();
   const [movie, setMovie] = useState({});
-  const [filteredMovies, setFilteredMovies] = useState([]);
   const router = useRouter();
-
-  const [comments, setComments] = useState([
-    { id: '1', user: 'Usuario 1', text: 'Me pareció genial la película, tiene una muy buena trama' },
-    { id: '2', user: 'Usuario 2', text: 'No me gustó, muy difícil de entender.' },
-  ]);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-
+  const [userCommentId, setUserCommentId] = useState('');
+  
   // Fetch de la información de la película
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const response = await fetch(`http://192.168.1.13:3000/api/contenido/${movieId}`);
+        const response = await fetch(`http://192.168.68.107:3000/api/contenido/${movieId}`);
         if (!response.ok) {
           throw new Error('Error al obtener los detalles de la película');
         }
@@ -66,11 +62,44 @@ const MovieScreen = () => {
     if (movieId) {
       fetchMovie();
     }
+     // Llamar a fetchComments después de obtener los detalles de la película
+     if (movieId) {
+      fetchComments(movieId);
+    }
   }, [movieId]);
 
+  useEffect(() => {
+    fetchUserData(); // Se ejecutará solo una vez al montar el componente
+  }, []);
+
+  const fetchComments = async (contenidoId) => {
+    try {
+      const response = await fetch(`http://192.168.68.107:3000/api/clasificaciones/${contenidoId}`);
+      if (!response.ok) {
+        throw new Error('Error al obtener los comentarios');
+      }
+      
+      const data = await response.json();
+  
+      // Formatear los comentarios según la estructura deseada
+      const formattedComments = data.map(comment => ({
+        id: comment.id,
+        text: comment.comentario,
+        contenido_id: comment.contenido_id,
+        usuario_id: comment.usuario_id,
+        user: comment.usuario_nombre + ' ' + comment.usuario_apellido,
+      }));
+  
+      // Supongamos que tienes un estado para almacenar los comentarios
+      setComments(formattedComments);
+    } catch (error) {
+      Alert.alert('Error', `Error al obtener los comentarios: ${error.message}`);
+    }
+  };
+  
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://192.168.1.13:3000/api/contenido/${id}`, {
+      const response = await fetch(`http://192.168.68.107:3000/api/contenido/${id}`, {
         method: 'DELETE',
       });
 
@@ -84,12 +113,6 @@ const MovieScreen = () => {
       Alert.alert('Error', `No se pudo eliminar la película: ${error.message}`);
     }
   };
-
-
-  const handleDeleteComments = (id) => {
-    setComments((prevComments) => prevComments.filter(comment => comment.id !== id));
-  };
-
   const handleEdit = () => {
     router.push({
       pathname: '/editMovie',
@@ -97,17 +120,77 @@ const MovieScreen = () => {
     });
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (newComment.trim()) {
       const newCommentObj = {
-        id: Math.random().toString(),
-        user: 'Usuario nuevo',
-        text: newComment,
+        usuario_id: userCommentId, // Aquí puedes reemplazarlo con el usuario real
+        comentario: newComment,
+        contenido_id: movie.id,
       };
-      setComments((prevComments) => [...prevComments, newCommentObj]);
-      setNewComment('');
+  
+      try {
+        const response = await fetch('http://192.168.68.107:3000/api/clasificaciones', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newCommentObj),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Error al agregar el comentario: ${response.statusText}`);
+        }
+  
+        const savedComment = await response.json();
+         // Actualiza la lista de comentarios
+        // Formatear el comentario según la estructura deseada
+        // Agrega el comentario recién guardado a la lista local
+        setComments((prevComments) => [...prevComments, savedComment]);
+
+        setNewComment(''); // Limpia el campo de texto
+        console.log("Comentario guardado:", comments);
+        await fetchComments(movie.id);
+      } catch (error) {
+        Alert.alert('Error', `No se pudo agregar el comentario: ${error.message}`);
+      }
     }
   };
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const response = await fetch(`http://192.168.68.107:3000/api/clasificaciones/${commentId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Error al eliminar el comentario');
+
+      // Eliminar el comentario del estado local
+      setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
+      Alert.alert('Éxito', 'Comentario eliminado correctamente');
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  const getData = async (key) => {
+    try {
+      const value = await AsyncStorage.getItem(key);
+      return value ? JSON.parse(value) : null;
+    } catch (e) {
+      console.error("Error al leer los datos:", e);
+    }
+  };
+  const fetchUserData = async () => {
+    try {
+      const userLocalStorage = await getData("user");
+      setUserCommentId(userLocalStorage.usuarioEncontrado.id);
+       console.log("Datos del usuario:", userLocalStorage);
+    } catch (error) {
+      console.error("Error al obtener datos del usuario:", error);
+    }
+  };
+  
+
+  console.log("Este es el nombre del usuario por fuera",userCommentId);
+  
 
   return (
     <View style={styles.container}>
@@ -148,14 +231,19 @@ const MovieScreen = () => {
       </View>
 
       {/* Sección de Comentarios */}
+      <KeyboardAvoidingView
+      style={{ flexGrow: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      {/* Sección de Comentarios */}
       <View style={styles.commentsSection}>
         <ScrollView style={styles.comment}>
-          {comments.map((comment) => (
+          {comments.map((comment, index) => (
             <CommentCard
-              key={comment.id}
+              key={comment.id || index}
               comment={comment}
-              onDelete={() => handleDelete(comment.id)}
-              onEdit={() => handleEdit(comment.id)}
+              onDelete={() => handleDeleteComment(comment.id)}
+              onEdit={handleEdit}
             />
           ))}
         </ScrollView>
@@ -168,11 +256,15 @@ const MovieScreen = () => {
             value={newComment}
             onChangeText={setNewComment}
           />
-          <TouchableOpacity style={styles.commentButton} onPress={handleAddComment}>
+          <TouchableOpacity
+            style={styles.commentButton}
+            onPress={handleAddComment}
+          >
             <Icon name="send" size={16} color="white" />
           </TouchableOpacity>
         </View>
       </View>
+    </KeyboardAvoidingView>
     </View>
   );
 };
@@ -224,8 +316,12 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 20,
   },
+  containerComment: {	
+    flex: 1,
+  },
   commentsSection: {
-    marginTop: 20,
+    flex: 1,
+    marginBottom: 10,
   },
   comment: {
     marginTop: 20,

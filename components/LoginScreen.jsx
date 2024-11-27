@@ -7,7 +7,7 @@ import { getAuth, signInWithEmailAndPassword, sendEmailVerification} from 'fireb
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../firebase-config';
 import { useRouter } from 'expo-router';
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -28,13 +28,20 @@ export default function LoginScreen() {
         console.log(user);
 
         if (user.emailVerified) {
-          if(email === 'senatvapp@gmail.com') {
-            router.push('/movieTabs/movies');
+          fetchUserEmails();
+          if(email === 'oswaldordonez@unicauca.edu.co') {
+            router.push({
+              pathname: '/movieTabs/movies',
+              params: { user:user},
+            });
             console.log('Entro en esta condicion');
           }
           else{
-            router.push('/movieUser');
-          }
+            router.push({
+              pathname: '/movieUser',
+              params: { user:user},
+            });
+        }
           
         } else {
           Alert.alert(
@@ -54,6 +61,38 @@ export default function LoginScreen() {
         console.log(error);
         Alert.alert(error.message);
       });
+  };
+  const fetchUserEmails = async () => {
+    try {
+      const response = await fetch("http://192.168.68.107:3000/api/usuarios"); // Reemplaza con el endpoint real
+      if (!response.ok) {
+        throw new Error("Error al obtener usuarios");
+      }
+      const usuarios = await response.json();
+
+      const usuarioEncontrado = usuarios.find(
+        (usuario) => usuario.correo === email
+      );
+      console.log(usuarioEncontrado);
+      await storeData('user', { usuarioEncontrado });
+      // Filtrar y mostrar solo los emails
+      if (usuarioEncontrado) {
+        console.log("Usuario encontrado:", usuarioEncontrado);
+      } else {
+        console.log("Usuario no encontrado");
+      }
+    } catch (error) {
+      console.error("Error al obtener usuarios:", error);
+      console.log("Error", "No se pudieron obtener los usuarios");
+    }
+  };
+
+  const storeData = async (key, value) => {
+    try {
+      await AsyncStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.error("Error al guardar los datos:", e);
+    }
   };
 
 

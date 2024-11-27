@@ -24,13 +24,41 @@ export default function RegisterScreen() {
         console.log('Cuenta Creada!');
         const user = userCredential.user;
         console.log(user);
-        sendEmailVerification(user); // Envía el correo de verificación al crear la cuenta
+        sendEmailVerification(user);
+        saveUserToDatabase(name, lastName, email, "Usuario"); // Envía el correo de verificación al crear la cuenta
         Alert.alert('Email de verificación enviado', 'Revisa ru correo para verificar la cuenta.');
         navigation.navigate('login')
       })
       .catch((error) => {
         console.log(error);
         Alert.alert(error.message);
+      });
+  };
+  const saveUserToDatabase = (nombre, apellido, correo, tipo_usuario_id) => {
+    fetch("http://192.168.68.107:3000/api/usuarios", { // Cambia esta URL a tu endpoint
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        nombre: nombre,
+        apellido: apellido,
+        correo: correo,
+        tipo_usuario_id: tipo_usuario_id,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error al guardar el usuario en la base de datos.");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Usuario guardado exitosamente en la base de datos:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        Alert.alert("Error", "No se pudo guardar el usuario en la base de datos.");
       });
   };
 
@@ -66,7 +94,7 @@ export default function RegisterScreen() {
           placeholder="Apellido"
           value={lastName}
           onChangeText={(text) => setLastName(text)}
-          keyboardType="email-address"
+          keyboardType="text"
           autoCapitalize="none"
          placeholderTextColor="gray"
         /> 
