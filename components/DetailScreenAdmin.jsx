@@ -5,7 +5,7 @@ import { useLocalSearchParams } from 'expo-router';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { BACK } from '@env';
 const CommentCard = ({ comment, onDelete, onEdit }) => {
 
   console.log(onDelete);
@@ -47,7 +47,7 @@ const MovieScreen = () => {
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const response = await fetch(`http://192.168.68.107:3000/api/contenido/${movieId}`);
+        const response = await fetch(`${BACK}/api/contenido/${movieId}`);
         if (!response.ok) {
           throw new Error('Error al obtener los detalles de la película');
         }
@@ -74,7 +74,7 @@ const MovieScreen = () => {
 
   const fetchComments = async (contenidoId) => {
     try {
-      const response = await fetch(`http://192.168.68.107:3000/api/clasificaciones/${contenidoId}`);
+      const response = await fetch(`${BACK}/api/clasificaciones/${contenidoId}`);
       if (!response.ok) {
         throw new Error('Error al obtener los comentarios');
       }
@@ -99,7 +99,7 @@ const MovieScreen = () => {
   
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://192.168.68.107:3000/api/contenido/${id}`, {
+      const response = await fetch(`${BACK}/api/contenido/${id}`, {
         method: 'DELETE',
       });
 
@@ -129,7 +129,7 @@ const MovieScreen = () => {
       };
   
       try {
-        const response = await fetch('http://192.168.68.107:3000/api/clasificaciones', {
+        const response = await fetch(`${BACK}/api/clasificaciones`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ const MovieScreen = () => {
   };
   const handleDeleteComment = async (commentId) => {
     try {
-      const response = await fetch(`http://192.168.68.107:3000/api/clasificaciones/${commentId}`, {
+      const response = await fetch(`${BACK}/api/clasificaciones/${commentId}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Error al eliminar el comentario');

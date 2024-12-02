@@ -5,6 +5,7 @@ import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from '
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../firebase-config';
 import { useNavigation } from '@react-navigation/native';
+import { BACK } from '@env';
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState("");
@@ -35,7 +36,7 @@ export default function RegisterScreen() {
       });
   };
   const saveUserToDatabase = (nombre, apellido, correo, tipo_usuario_id) => {
-    fetch("http://192.168.68.107:3000/api/usuarios", { // Cambia esta URL a tu endpoint
+    fetch(`${BACK}/api/usuarios`, { // Cambia esta URL a tu endpoint
       method: "POST",
       headers: {
         "Content-Type": "application/json",

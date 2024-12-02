@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Pressable, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-
+import { BACK } from '@env';
 
 export default function AddMovieForm() {
 
@@ -28,7 +28,7 @@ export default function AddMovieForm() {
     };
 
     try {
-      const response = await fetch('http://192.168.68.107:3000/api/contenido', {
+      const response = await fetch((`${BACK}/api/contenido`), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

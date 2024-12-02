@@ -10,23 +10,37 @@
     "splash": {
       "image": "./assets/senatv.png",
       "resizeMode": "contain",
-      "backgroundColor": "rgba(145, 188, 190, 1)"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.senatvapp.SenaApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d8db0410-8a90-4ad7-bb83-197381455cc7"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d8db0410-8a90-4ad7-bb83-197381455cc7"
+    }
   }
 }

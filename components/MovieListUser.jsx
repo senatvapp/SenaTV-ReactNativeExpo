@@ -3,7 +3,7 @@ import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity,
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import { BACK } from '@env';
 
 const generoMap = {
   "1": "Acción",
@@ -49,7 +49,7 @@ const MovieList = () => {
  
   const fetchMovies = async () => {
     try {
-      const response = await fetch('http://192.168.68.107:3000/api/contenido');
+      const response = await fetch(`${BACK}/api/contenido`);
       const data = await response.json();
       setMovies(data);
       setFilteredMovies(data);

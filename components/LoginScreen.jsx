@@ -8,6 +8,7 @@ import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../firebase-config';
 import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BACK } from '@env';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -21,6 +22,8 @@ export default function LoginScreen() {
   const auth = getAuth(app);
   
   const handleSignIn = () => {
+    console.log(BACK,"eSTE ES UNA VARIABLE DE ENTONRNO");
+    
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('Logueado!');
@@ -64,7 +67,7 @@ export default function LoginScreen() {
   };
   const fetchUserEmails = async () => {
     try {
-      const response = await fetch("http://192.168.68.107:3000/api/usuarios"); // Reemplaza con el endpoint real
+      const response = await fetch(`${BACK}/api/usuarios`); // Reemplaza con el endpoint real
       if (!response.ok) {
         throw new Error("Error al obtener usuarios");
       }
