@@ -22,9 +22,8 @@ export default function RegisterScreen() {
   const handleCreateAccount = () => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log('Cuenta Creada!');
+        
         const user = userCredential.user;
-        console.log(user);
         sendEmailVerification(user);
         saveUserToDatabase(name, lastName, email, "Usuario"); // Envía el correo de verificación al crear la cuenta
         Alert.alert('Email de verificación enviado', 'Revisa ru correo para verificar la cuenta.');

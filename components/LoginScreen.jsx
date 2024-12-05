@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import { useNavigation } from '@react-navigation/native';
 import { Link } from "expo-router";
 import { getAuth, signInWithEmailAndPassword, sendEmailVerification} from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
@@ -21,23 +20,18 @@ export default function LoginScreen() {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   
-  const handleSignIn = () => {
-    console.log(BACK,"eSTE ES UNA VARIABLE DE ENTONRNO");
-    
+  const handleSignIn = () => {    
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log('Logueado!');
         const user = userCredential.user;
-        console.log(user);
-
         if (user.emailVerified) {
           fetchUserEmails();
-          if(email === 'oswaldordonez@unicauca.edu.co') {
+          if(email.toLowerCase() === 'senatvapp@gmail.com') {
             router.push({
               pathname: '/movieTabs/movies',
               params: { user:user},
             });
-            console.log('Entro en esta condicion');
+            
           }
           else{
             router.push({
@@ -54,14 +48,13 @@ export default function LoginScreen() {
               { text: 'OK' },
               {
                 text: 'Reenviar verificación',
-                onPress: () => sendEmailVerification(user).then(() => Alert.alert('Verification email sent')),
+                onPress: () => sendEmailVerification(user).then(() => Alert.alert('Correo de verificación enviado')),
               },
             ]
           );
         }
       })
       .catch((error) => {
-        console.log(error);
         Alert.alert(error.message);
       });
   };
@@ -76,17 +69,10 @@ export default function LoginScreen() {
       const usuarioEncontrado = usuarios.find(
         (usuario) => usuario.correo === email
       );
-      console.log(usuarioEncontrado);
       await storeData('user', { usuarioEncontrado });
-      // Filtrar y mostrar solo los emails
-      if (usuarioEncontrado) {
-        console.log("Usuario encontrado:", usuarioEncontrado);
-      } else {
-        console.log("Usuario no encontrado");
-      }
+     
     } catch (error) {
       console.error("Error al obtener usuarios:", error);
-      console.log("Error", "No se pudieron obtener los usuarios");
     }
   };
 

@@ -30,14 +30,11 @@ function LoginScreen() {
   const handleCreateAccount = () => {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log('Account created!');
         const user = userCredential.user;
-        console.log(user);
         sendEmailVerification(user); // Envía el correo de verificación al crear la cuenta
-        Alert.alert('Verification email sent', 'Please check your email to verify your account.');
+        Alert.alert('Email de verificación enviado', 'Por favor, revisa tu correo electrónico para verificar tu cuenta');
       })
       .catch((error) => {
-        console.log(error);
         Alert.alert(error.message);
       });
   };
@@ -45,28 +42,27 @@ function LoginScreen() {
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log('Signed in!');
+        
         const user = userCredential.user;
-        console.log(user);
+        
 
         if (user.emailVerified) {
           navigation.navigate('Home');
         } else {
           Alert.alert(
-            'Email not verified',
-            'Please verify your email before proceeding.',
+            'Correo no verificado',
+            'Por favor, verifica tu correo electrónico antes de continuar.',
             [
               { text: 'OK' },
               {
                 text: 'Resend Verification',
-                onPress: () => sendEmailVerification(user).then(() => Alert.alert('Verification email sent')),
+                onPress: () => sendEmailVerification(user).then(() => Alert.alert('Correo de verificación enviado')),
               },
             ]
           );
         }
       })
       .catch((error) => {
-        console.log(error);
         Alert.alert(error.message);
       });
   };
@@ -77,16 +73,16 @@ function LoginScreen() {
       sendPasswordResetEmail(auth, email)
         .then(() => {
           Alert.alert(
-            'Password Reset Email Sent',
-            'Check your email to reset your password.'
-          );
+            'Correo de Restablecimiento de Contraseña Enviado',
+            'Revisa tu correo electrónico para restablecer tu contraseña.'
+        );
         })
         .catch((error) => {
-          console.log(error);
           Alert.alert('Error', error.message);
         });
     } else {
-      Alert.alert('Enter Email', 'Please enter your email address to reset your password.');
+      Alert.alert('Ingresar Correo', 'Por favor, ingresa tu dirección de correo electrónico para restablecer tu contraseña.');
+
     }
   };
 

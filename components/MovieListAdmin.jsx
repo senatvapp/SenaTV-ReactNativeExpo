@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
@@ -59,22 +59,21 @@ const MovieList = () => {
       const data = await response.json();
       setMovies(data);
       setFilteredMovies(data);
-      console.log("Movies fetched:", data);
     } catch (error) {
       Alert.alert('Error', `Error al obtener las películas: ${error.message}`);
     }
   };
-  useEffect(() => {
-     fetchMovies();
-  }, []);
-
   // useEffect(() => {
-  //   // Iniciar el intervalo de pooling cada segundo (1000 ms)
-  //   const intervalId = setInterval(fetchMovies, 1000);
-
-  //   // Limpiar el intervalo cuando el componente se desmonte
-  //   return () => clearInterval(intervalId);
+  //    fetchMovies();
   // }, []);
+
+  useEffect(() => {
+    // Iniciar el intervalo de pooling cada segundo (1000 ms)
+    const intervalId = setInterval(fetchMovies, 1000);
+
+    // Limpiar el intervalo cuando el componente se desmonte
+    return () => clearInterval(intervalId);
+  }, []);
   
   useEffect(() => {
     // Filtrar las películas en función del texto ingresado

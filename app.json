@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/senatv.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.senatvapp.SenaApp"
@@ -33,7 +33,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "d8db0410-8a90-4ad7-bb83-197381455cc7"
+        "projectId": "b6e28324-32c6-44f4-a219-7cceed999edb"
       }
     },
     "runtimeVersion": {

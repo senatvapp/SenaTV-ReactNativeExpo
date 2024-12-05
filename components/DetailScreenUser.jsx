@@ -7,10 +7,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BACK } from '@env';
 
-const CommentCard = ({ comment, onDelete, onEdit }) => {
-
-  console.log(onDelete);
-  
+const CommentCard = ({ comment, onDelete }) => {
   
   return (
     <View style={styles.card}>
@@ -54,7 +51,6 @@ const MovieScreen = () => {
         }
         const data = await response.json();
         setMovie(data);
-        console.log("Movie fetched:", data);
       } catch (error) {
         Alert.alert('Error', `Error al obtener la película: ${error.message}`);
       }
@@ -150,9 +146,7 @@ const MovieScreen = () => {
         setComments((prevComments) => [...prevComments, savedComment]);
   
         setNewComment(''); // Limpia el campo de texto
-        
-        
-        console.log("Comentario guardado:", comments);
+
         await fetchComments(movie.id);
 
 
@@ -188,16 +182,11 @@ const MovieScreen = () => {
     try {
       const userLocalStorage = await getData("user");
       setUserCommentId(userLocalStorage.usuarioEncontrado.id);
-       console.log("Datos del usuario:", userLocalStorage);
     } catch (error) {
       console.error("Error al obtener datos del usuario:", error);
     }
   };
   
-
-  console.log("Este es el nombre del usuario por fuera",userCommentId);
-  
-
   return (
     <View style={styles.container}>
       <View style={styles.detailSection}>

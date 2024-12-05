@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Pressable } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { BACK } from '@env';
 
@@ -38,7 +38,7 @@ export default function AddMovieForm() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Exito', 'Película agregada correctamente');
+        
         // Resetear los camp.os del formulario
         setTitle('');
         setYear('');
@@ -49,7 +49,7 @@ export default function AddMovieForm() {
         setImage('');
       } else {
         const errorData = await response.json();
-        console.log('Error', `Error else: ${errorData.message}`);
+        
       }
     } catch (error) {
       console.log('Error', `Error catch: ${error.message}`);
